@@ -39,4 +39,19 @@ describe("HTTP server", () => {
             "terjadi kegagalan pada server kami"
         );
     });
+
+    describe("When GET /", () => {
+        it("should return welcome message with 200 statusCode", async () => {
+            const server = await createServer({});
+
+            const response = await server.inject({
+                method: "GET",
+                url: "/",
+            });
+
+            const responseJson = JSON.parse(response.payload);
+            expect(responseJson.statusCode).toEqual(200);
+            expect(responseJson.message).toEqual("Welcome to forum api.");
+        });
+    });
 });
