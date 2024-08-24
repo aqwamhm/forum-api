@@ -23,6 +23,7 @@ describe("DetailThread", () => {
             date: 20240812,
             username: "aqwamhm",
             comments: [],
+            commentsLikeCounts: [],
         };
 
         expect(() => new DetailThread(payload)).toThrow(
@@ -44,6 +45,12 @@ describe("DetailThread", () => {
                     date: "2024-08-12T00:00:00.000Z",
                     content: 1234,
                     is_deleted: false,
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
                 },
             ],
         };
@@ -69,6 +76,12 @@ describe("DetailThread", () => {
                     is_deleted: false,
                 },
             ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
+                },
+            ],
         };
 
         const detailThread = new DetailThread(payload);
@@ -78,7 +91,16 @@ describe("DetailThread", () => {
         expect(detailThread.body).toEqual(payload.body);
         expect(detailThread.date).toEqual(payload.date);
         expect(detailThread.username).toEqual(payload.username);
-        expect(detailThread.comments).toEqual(payload.comments);
+
+        expect(detailThread.comments.length).toEqual(1);
+        expect(detailThread.comments[0].id).toEqual("comment-123");
+        expect(detailThread.comments[0].username).toEqual("aqwamhm");
+        expect(detailThread.comments[0].date).toEqual(
+            "2024-08-12T00:00:00.000Z"
+        );
+        expect(detailThread.comments[0].content).toEqual("This is a comment");
+        expect(detailThread.comments[0].is_deleted).toEqual(false);
+        expect(detailThread.comments[0].likeCount).toEqual(1);
     });
 
     it("should throw an error if comments array contains an object with missing properties", () => {
@@ -92,6 +114,12 @@ describe("DetailThread", () => {
                 {
                     id: "comment-12323",
                     username: "aqwamhm",
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
                 },
             ],
         };
@@ -117,6 +145,12 @@ describe("DetailThread", () => {
                     is_deleted: "false",
                 },
             ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
+                },
+            ],
         };
 
         expect(() => new DetailThread(payload)).toThrow(
@@ -132,6 +166,7 @@ describe("DetailThread", () => {
             date: "2024-08-12T00:00:00.000Z",
             username: "aqwamhm",
             comments: [],
+            commentsLikeCounts: [],
         };
 
         const detailThread = new DetailThread(payload);
@@ -152,6 +187,12 @@ describe("DetailThread", () => {
                     username: "aqwamhm",
                     date: "2024-08-12T00:00:00.000Z",
                     content: "This is a comment",
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
                 },
             ],
         };
@@ -177,6 +218,12 @@ describe("DetailThread", () => {
                     is_deleted: "false",
                 },
             ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
+                },
+            ],
         };
 
         expect(() => new DetailThread(payload)).toThrow(
@@ -198,6 +245,12 @@ describe("DetailThread", () => {
                     date: "2024-08-12T00:00:00.000Z",
                     content: "This is a comment",
                     is_deleted: true,
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
                 },
             ],
         };
@@ -225,10 +278,98 @@ describe("DetailThread", () => {
                     is_deleted: false,
                 },
             ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-123",
+                    like_count: "1",
+                },
+            ],
         };
 
         const detailThread = new DetailThread(payload);
 
         expect(detailThread.comments[0].content).toEqual("This is a comment");
+    });
+
+    it("should throw error if commentsLikeCounts length not same with comments length", () => {
+        const payload = {
+            id: "thread-123",
+            title: "Sample Title",
+            body: "Sample Body",
+            date: "2024-08-12T00:00:00.000Z",
+            username: "aqwamhm",
+            comments: [
+                {
+                    id: "comment-123",
+                    username: "aqwamhm",
+                    date: "2024-08-12T00:00:00.000Z",
+                    content: "This is a comment",
+                    is_deleted: false,
+                },
+            ],
+            commentsLikeCounts: [],
+        };
+
+        expect(() => new DetailThread(payload)).toThrowError(
+            "DETAIL_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION"
+        );
+    });
+
+    it("should throw error if commentsLikeCounts.comment_id does not match comments.id property", () => {
+        const payload = {
+            id: "thread-123",
+            title: "Sample Title",
+            body: "Sample Body",
+            date: "2024-08-12T00:00:00.000Z",
+            username: "aqwamhm",
+            comments: [
+                {
+                    id: "comment-123",
+                    username: "aqwamhm",
+                    date: "2024-08-12T00:00:00.000Z",
+                    content: "This is a comment",
+                    is_deleted: false,
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    comment_id: "comment-456",
+                    like_count: "1",
+                },
+            ],
+        };
+
+        expect(() => new DetailThread(payload)).toThrowError(
+            "DETAIL_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION"
+        );
+    });
+
+    it("should throw error if commentsLikeCounts does not contain comment_id and like_count property", () => {
+        const payload = {
+            id: "thread-123",
+            title: "Sample Title",
+            body: "Sample Body",
+            date: "2024-08-12T00:00:00.000Z",
+            username: "aqwamhm",
+            comments: [
+                {
+                    id: "comment-123",
+                    username: "aqwamhm",
+                    date: "2024-08-12T00:00:00.000Z",
+                    content: "This is a comment",
+                    is_deleted: false,
+                },
+            ],
+            commentsLikeCounts: [
+                {
+                    commentid: "comment-123",
+                    likecount: "1",
+                },
+            ],
+        };
+
+        expect(() => new DetailThread(payload)).toThrowError(
+            "DETAIL_THREAD.NOT_CONTAIN_NEEDED_PROPERTY"
+        );
     });
 });
